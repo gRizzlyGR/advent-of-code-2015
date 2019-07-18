@@ -9,7 +9,7 @@ import (
 func main() {
 	buffer, err := ioutil.ReadFile("../input")
 	if err != nil {
-		log.Fatalln("File cannot be opened", err)
+		log.Fatalln("Cannot read file", err)
 	}
 
 	leftP := byte('(')
