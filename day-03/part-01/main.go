@@ -11,89 +11,48 @@ var s = byte('v')
 var e = byte('>')
 var w = byte('<')
 
+type coords struct {
+	row int
+	col int
+}
+
 func main() {
 	buffer, err := ioutil.ReadFile("../input")
 	if err != nil {
 		log.Fatalln("Cannot read file", err)
 	}
 
-	//buffer = []byte{'^', 'v', '^', 'v', '^', 'v', '^', 'v', '^', 'v'}
-	//buffer = []byte{'^', '>', 'v', '<'}
-	//buffer = []byte{'>'}
 	fmt.Println(move(buffer))
 
 }
 
-func initCycle() map[byte][]byte {
-	cycle := make(map[byte][]byte)
+func move(path []byte) int {
+	grid := make(map[coords]int)
 
-	cycle[n] = []byte{e, s, w}
-	cycle[s] = []byte{w, n, e}
-	cycle[e] = []byte{s, w, n}
-	cycle[w] = []byte{n, e, s}
+	point := coords{0, 0}
+	grid[point]++
 
-	return cycle
-}
-
-func initOpposite() map[byte]byte {
-	opposite := make(map[byte]byte)
-
-	opposite[n] = s
-	opposite[s] = n
-	opposite[e] = w
-	opposite[w] = e
-
-	return opposite
-}
-
-func move(buffer []byte) int {
-	cycle := initCycle()
-	opposite := initOpposite()
-
-	sliceEqual := func(a, b []byte) bool {
-		if len(a) != len(b) {
-			return false
-		}
-
-		for i := range a {
-			if a[i] != b[i] {
-				return false
-			}
-		}
-
-		return true
+	for _, dir := range path {
+		point = next(point, dir)
+		grid[point]++
 	}
 
-	count := 0
-	for i, curr := range buffer {
-		if i == 0 {
-			count++
-			continue
-		}
+	return len(grid)
+}
 
-		prev := buffer[i-1]
-
-		if opposite[curr] == prev && (i-1 != 0) {
-			fmt.Println(i, string(curr), string(prev))
-			continue
-		}
-
-		if i < 3 {
-			count++
-			continue
-		}
-
-		prevPrev := buffer[i-2]
-		prevPrevPrev := buffer[i-3]
-
-		if sliceEqual(cycle[curr], []byte{prev, prevPrev, prevPrevPrev}) {
-			fmt.Println(i, string(prevPrevPrev), string(prevPrev), string(prev), string(curr))
-			continue
-		}
-
-		count++
-
+func next(point coords, direction byte) coords {
+	switch direction {
+	case n:
+		return coords{point.row - 1, point.col}
+	case s:
+		return coords{point.row + 1, point.col}
+	case e:
+		return coords{point.row, point.col + 1}
+	case w:
+		return coords{point.row, point.col - 1}
+	default:
+		log.Fatalln("Unknown direction:", string(direction))
 	}
 
-	return count
+	return coords{0, 0}
 }
