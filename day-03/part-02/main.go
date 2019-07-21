@@ -29,8 +29,11 @@ func main() {
 func move(path []byte) int {
 	grid := make(map[coords]int)
 
+	// The two Santas start delivering at the same house.
+	// It's not needed to increment by two,actually
+	// but this way it's compliant to the story
 	origin := coords{0, 0}
-	grid[origin] += 2 // The two Santas start delivering at the same house
+	grid[origin] += 2
 
 	c := make(chan coords)
 	go deliver(path, 0, 2, origin, c) // Santa
